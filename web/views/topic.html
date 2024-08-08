@@ -1,0 +1,58 @@
+{{ define "topic" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Reddit Clone</title>
+</head>
+<body>
+	<h1>{{ .ID }}</h1>
+	<div> <a href="/">Back</a> </div>
+	<form id="postform">
+		<h3>New Post:</h3>
+		<label for="title">Title: </label><input id="title" name="title" type="text"/>
+		<label for="content">Content: </label><input id="content" name="content" type="text"/>
+		<button type="submit">Create Post</button>
+	</form>
+	<h2>Posts:</h2>
+	{{ range .Posts }}
+	<div> 
+		<a href="/topics/{{ .TopicID }}/posts/{{ .ID }}">{{ .Title }}</a>
+		<p>Votes: {{ .Votes }}</p>
+		<button id="{{ .ID }}-upvote">Up</button>
+		<button id="{{ .ID }}-downvote">Down</button>
+	</div>
+	{{ end }}
+</body>
+<script>
+	const postForm = document.querySelector("#postform");
+	async function createPost() {
+		try {
+			const response = await fetch("/topics/{{ .ID }}/posts", {method: "POST", body: new FormData(postForm)});
+			location.reload();
+		} catch (e) { console.error(e); }
+	}
+	postForm.addEventListener("submit", (event) => { event.preventDefault(); createPost(); });
+
+	async function upVote(id) {
+		try {
+			const response = await fetch("/topics/{{ .ID }}/posts/"+id+"/upvote", {method: "POST"})
+			location.reload();
+		} catch (e) { console.log(e); }
+	}
+
+	async function downVote(id) {
+		try {
+			const response = await fetch("/topics/{{ .ID }}/posts/"+id+"/downvote", {method: "POST"})
+			location.reload();
+		} catch (e) { console.log(e); }
+	}
+	
+	{{ range .Posts }}
+	document.getElementById("{{ .ID }}-upvote").addEventListener("click", ((event) => upVote("{{ .ID }}")))
+	document.getElementById("{{ .ID }}-downvote").addEventListener("click", ((event) => downVote("{{ .ID }}")))
+	{{ end }}
+</script>
+</html>
+{{ end }}

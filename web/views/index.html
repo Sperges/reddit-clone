@@ -1,0 +1,32 @@
+{{ define "index" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Reddit Clone</title>
+</head>
+<body>
+	<h1>Welcome!</h1>
+	<form id="topicform">
+		<h3>New Topic:</h3>
+		<label for="name">Name: </label><input id="id" name="id" type="text"/>
+		<button type="submit">Create Topic</button>
+	</form>
+	<h2>Topics:</h2>
+	{{ range . }}
+	<div><a href="/topics/{{ .ID }}">{{ .ID }}</a></div>
+	{{ end }}
+</body>
+<script>
+	const topicForm = document.querySelector("#topicform");
+	async function createTopic() {
+		try {
+			const response = await fetch("/topics", {method: "POST", body: new FormData(topicForm)});
+			location.reload();
+		} catch (e) { console.error(e); }
+	}
+	topicForm.addEventListener("submit", (event) => { event.preventDefault(); createTopic(); });
+</script>
+</html>
+{{ end }}
